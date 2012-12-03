@@ -1,24 +1,17 @@
+## MF Sniffer
 
-          ____________________________
-        /|............................|
-       | |:         Mainframe        :|
-       | |:     Password Sniffer     :|
-       | |:     ,-.   _____   ,-.    :|
-       | |:    ( `)) [_____] ( `))   :|
-       |v|:     `-`   ' ' '   `-`    :|
-       |||:     ,______________.     :|
-       |||...../::::o::::::o::::\.....|
-       |^|..../:::O::::::::::O:::\....|
-       |/`---/--------------------`---|
-       `.___/ /====/ /=//=/ /====/____/
-            `--------------------'
-       Stealing passwords like its 1985
 
-usage: MFSniffer.py [-h] [-a IP] [-p PORT] [-i INTERFACE]
+Script to capture unencrypted TSO login credentials              	     
 
-MF Sniffer - A script to capture TSO user ID and password
+**Requirements**: Python, scapy and IP/Port of mainframe           
 
-arguments:
+**Created by**: Soldier of Fortran (@mainframed767)                
+
+**Use**: Given an interface, IP and port this script will try to sniff mainframe user IDs and  passwords sent over cleartext using TN3270 (tested against x3270 and TN3270X). This scrypt does not work if the mainframe is using SSL encryption (default port 923).       
+                                                                                                           
+
+## Arguments:
+
   -h, --help            show this help message and exit
   
   -a IP, --ip IP        Mainframe TN3270 server IP address
@@ -27,3 +20,6 @@ arguments:
   
   -i INTERFACE, --interface INTERFACE network interface to listen on
   
+## Screenshot
+  
+![ScreenShot](https://raw.github.com/mainframed/MFSniffer/master/MFSniffer-Screenshot.png)
