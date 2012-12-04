@@ -90,13 +90,12 @@ def EbcdicToAscii(s):
 
 def sniffTSO(pkt):
 	raw=pkt.sprintf("%r,Raw.load%")
-	src=pkt.sprintf("%IP.src%")
 	dst=pkt.sprintf("%IP.dst%")
-	sport=pkt.sprintf("%IP.sport%")
 	dport=pkt.sprintf("%IP.dport%")
-	#convert the raw string to an ebcdic string so we can search, etc
-	sniffed = EbcdicToAscii(raw[1:-1])
 	if dst == ip_address and dport == port and raw.__len__() < 200:
+		# If the destination and port match and the length of data is less than 200 chars 
+		# convert the raw string to an ebcdic string so we can search, etc
+		sniffed = EbcdicToAscii(raw[1:-1])
 		#print "[+] Length is", raw.__len__()
 		#print sniffed
 		#print "[+] Ordinals: ",
