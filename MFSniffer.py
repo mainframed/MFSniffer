@@ -88,8 +88,8 @@ if __name__ == '__main__':
     #start argument parser
     parser = argparse.ArgumentParser(description='MF Sniffer - A script to capture TSO user ID and password',
                                      epilog='PRESS PLAY ON TAPE')
-    parser.add_argument('-a', '--ip', help='Mainframe TN3270 server IP address', type=int)
-    parser.add_argument('-p', '--port', help='Mainframe TN3270 server listening port (e.g 23, 2323, 623, etc)')
+    parser.add_argument('-a', '--ip', help='Mainframe TN3270 server IP address')
+    parser.add_argument('-p', '--port', help='Mainframe TN3270 server listening port (e.g 23, 2323, 623, etc)', type=int)
     parser.add_argument('-i', '--interface', help='network interface to listen on')
     parser.add_argument('-r', '--pcapfile', help='PCAP file to read')
     args = parser.parse_args()
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     if args.ip is not None:
         flt += ' and dst host %s' % args.ip
     if args.port is not None:
-        flt += ' and dst port %d'
+        flt += ' and dst port %d' % args.port
     
     # Start scapy sniffer on interface and
     # pass all packets to the function sniffTSO
