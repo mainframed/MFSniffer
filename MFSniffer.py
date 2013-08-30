@@ -63,7 +63,9 @@ def EbcdicToAscii(s):
 magic = re.compile('}(\xc1\xd7\x11@Z|\xc9.\x11\xc9\xc3)', re.DOTALL)
 
 def sniffTSO(pkt):
-	raw=pkt.sprintf("%r,Raw.load%")
+	if Raw not in pkt:
+            return
+	raw=pkt[Raw].load
 	if raw.__len__() < 200:
 		# If the destination and port match and the length of data is less than 200 chars
 		# convert the raw string to an ebcdic string so we can search, etc
@@ -89,7 +91,18 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--ip', help='Mainframe TN3270 server IP address', type=int)
     parser.add_argument('-p', '--port', help='Mainframe TN3270 server listening port (e.g 23, 2323, 623, etc)')
     parser.add_argument('-i', '--interface', help='network interface to listen on')
+    parser.add_argument('-r', '--pcapfile', help='PCAP file to read')
     args = parser.parse_args()
+    
+    if args.pcapfile is not None:
+        print "-{X}- Reading file:", args.pcapfile
+        for p in PcapReader(args.pcapfile):
+            sniffTSO(p)
+        exit(0)
+
+    print "-{X}- Mainframe:", args.ip is not None and args.ip or '*', ':', args.port is not None and args.port or '*'
+    if args.interface is not None:
+        print "-{X}- Sniffer started on interface:", args.interface
     
     flt = 'tcp'
     if args.ip is not None:
@@ -97,10 +110,7 @@ if __name__ == '__main__':
     if args.port is not None:
         flt += ' and dst port %d'
 
-    print "-{X}- Mainframe:", args.ip is not None and args.ip or '*', ':', args.port is not None and args.port or '*'
-    if args.interface is not None:
-        print "-{X}- Sniffer started on interface:", args.interface
-    
+
     # Start scapy sniffer on interface and
     # pass all packets to the function sniffTSO
     sniff(iface=args.interface, prn=sniffTSO,
