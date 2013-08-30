@@ -99,7 +99,7 @@ if __name__ == '__main__':
         for p in PcapReader(args.pcapfile):
             sniffTSO(p)
         exit(0)
-
+    
     print "-{X}- Mainframe:", args.ip is not None and args.ip or '*', ':', args.port is not None and args.port or '*'
     if args.interface is not None:
         print "-{X}- Sniffer started on interface:", args.interface
@@ -109,8 +109,7 @@ if __name__ == '__main__':
         flt += ' and dst host %s' % args.ip
     if args.port is not None:
         flt += ' and dst port %d'
-
-
+    
     # Start scapy sniffer on interface and
     # pass all packets to the function sniffTSO
     sniff(iface=args.interface, prn=sniffTSO,
