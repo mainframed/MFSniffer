@@ -39,7 +39,6 @@ parser = argparse.ArgumentParser(description='MF Sniffer - A script to capture T
 parser.add_argument('-a','--ip', help='Mainframe TN3270 server IP address',dest='ip')
 parser.add_argument('-p','--port', help='Mainframe TN3270 server listening port (e.g 23, 2323, 623, etc)',dest='port')
 parser.add_argument('-i','--interface', help='network interface to listen on',dest='interface')
-args = parser.parse_args()
 results = parser.parse_args() # put the arg results in the variable results
 
 
