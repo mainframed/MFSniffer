@@ -74,18 +74,7 @@ e2a = [
 ]
 
 def EbcdicToAscii(s):
-    if type(s) != type(""):
-        raise "Bad data", "Expected a string argument"
-
-    if len(s) == 0:  return s
-
-    new = ""
-
-    for i in xrange(len(s)):
-        new += chr(e2a[ord(s[i])])
-    return new
-
-
+    return ''.join([ chr(e2a[ord(c)]) for c in s ])
 
 def sniffTSO(pkt):
 	raw=pkt.sprintf("%r,Raw.load%")
